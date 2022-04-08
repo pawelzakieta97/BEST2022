@@ -4,10 +4,10 @@ import threading
 
 
 class StreamReader(threading.Thread):
-    def __init__(self, url='http://192.168.85.50:8080/video'):
+    def __init__(self, url='http://192.168.85.50:8080/video', width=1280, height=720):
         super().__init__()
-        self.width = 1280
-        self.height = 720
+        self.width = width
+        self.height = height
         self.image = np.zeros((self.height, self.width, 3))
         self.url = url
         self.pipe = sp.Popen(["ffmpeg",
