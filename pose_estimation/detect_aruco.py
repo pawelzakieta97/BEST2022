@@ -55,9 +55,9 @@ camera_matrix = np.array([
 camera_distorition=np.loadtxt('distortion.txt', delimiter=',')
 
 while 1:
-    camera=cv2.VideoCapture("http://192.168.85.50:8080/video")
+    camera=cv2.VideoCapture("http://192.168.43.70:8080/video")
     _,frame=camera.read()
-    print(calculate_aruco(frame, camera_matrix, camera_distorition,0,0.50))
+    print(calculate_aruco(frame,camera_matrix,camera_distorition,0,0.50))
     cv2.imshow("okno",frame)
     cv2.waitKey(1)
 
