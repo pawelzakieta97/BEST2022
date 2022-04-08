@@ -32,16 +32,26 @@ def calculate_aruco(image,camera_matrix,camera_distortion,aruco_id,marker_size):
                                                  cameraMatrix=camera_matrix, distCoeff=camera_distortion)
     if ids is not None and ids[0] == aruco_id:
         ret = aruco.estimatePoseSingleMarkers(corners, marker_size, camera_matrix, camera_distortion)
+
         rvec, tvec = ret[0][0, 0, :], ret[1][0, 0, :]
+        r = cv2.drawFrameAxes(image, camera_matrix, None, rvec, tvec, 0.1)
         rotation_matrix = np.array([[0, 0, 0, 0],
                                     [0, 0, 0, 0],
                                     [0, 0, 0, 0],
                                     [0, 0, 0, 1]],
                                    dtype=float)
-
-        return tvec,rvec_to_yaw(rvec)
+        cv2.aruco.drawDetectedMarkers(image, corners, ids)
+        return tvec, rvec
 
 camera_matrix=np.loadtxt('camera.txt', delimiter=',')
+width = 1280
+height = 720
+f = width / 53 * 43
+camera_matrix = np.array([
+    [f, 0, width / 2],
+    [0, f, height / 2],
+    [0, 0, 1]
+])
 camera_distorition=np.loadtxt('distortion.txt', delimiter=',')
 
 while 1:
