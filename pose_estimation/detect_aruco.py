@@ -39,8 +39,10 @@ def calculate_aruco(image,camera_matrix,camera_distortion,aruco_id,marker_size):
                                     [0, 0, 0, 0],
                                     [0, 0, 0, 1]],
                                    dtype=float)
-
-        return tvec,rvec_to_yaw(rvec)
+        #rvec = cv2.Rodrigues(rvec)[0]
+        print(f"tvec -> {tvec}")
+        print(f"rvec -> {rvec}")
+        return tvec,rvec
 
 camera_matrix=np.loadtxt('camera.txt', delimiter=',')
 camera_distorition=np.loadtxt('distortion.txt', delimiter=',')
@@ -48,7 +50,7 @@ camera_distorition=np.loadtxt('distortion.txt', delimiter=',')
 while 1:
     camera=cv2.VideoCapture("http://192.168.43.70:8080/video")
     _,frame=camera.read()
-    print(calculate_aruco(frame,camera_matrix,camera_distorition,0,0.50))
+    calculate_aruco(frame,camera_matrix,camera_distorition,0,0.50)
     cv2.imshow("okno",frame)
     cv2.waitKey(1)
 
