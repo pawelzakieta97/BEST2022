@@ -5,14 +5,17 @@ import threading
 class RaspberryController:
     def __init__(self, url):
         self.url = url
+        self.enable = True
 
     def drive(self, amount):
-        resp = requests.post(self.url+'/drive', params={'power': amount})
-        return resp.content
+        if self.enable:
+            resp = requests.post(self.url+'/drive', params={'power': amount})
+            return resp.content
 
     def turn(self, amount):
-        resp = requests.post(self.url+'/turn', params={'angle': amount})
-        return resp.content
+        if self.enable:
+            resp = requests.post(self.url+'/turn', params={'angle': amount})
+            return resp.content
 
 
 if __name__ == '__main__':
