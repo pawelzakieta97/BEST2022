@@ -5,6 +5,7 @@ from human_pose.pose_reader import PoseReader
 from pose_estimation.aruco import get_camera, get_robot
 from stream_reader import StreamReader
 from transformations import render
+from raspberry_controller import RaspberryController
 
 if __name__ == '__main__':
 
@@ -34,6 +35,7 @@ if __name__ == '__main__':
     sr.start()
     robot_pos = None
     robot_yaw = None
+    camera_transformation = None
     while 1:
         # _, frame = camera.read()
         frame = sr.image
