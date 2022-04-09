@@ -44,27 +44,27 @@ app = Flask(__name__, static_url_path="/static", static_folder='/home/pawel/BEST
 
 def call_for_help():
     print("DZOWNIE PO POGOTOWIE")
-    playsound('./calling.mp3')
+    # playsound('./calling.mp3')
 
 
 def instruct():
     print("INFORMOWANIE O OPCJACH")
-    playsound('./instruct.mp3')
+    # playsound('./instruct.mp3')
 
 
 def disarm_call_for_help():
     print("NOT CALLING FOR HELP")
-    playsound('./disarm.mp3')
+    # playsound('./disarm.mp3')
 
 
 def kawusia_delivered():
     print("KAWUSIA DELIVERED")
-    playsound("./kawusia.mp3")
+    # playsound("./kawusia.mp3")
 
 
 def water_delivered():
     print("WATER DELIVERED")
-    playsound("./water.mp3")
+    # playsound("./water.mp3")
 
 
 pr = PoseReader()
@@ -87,17 +87,19 @@ camera_matrix = np.array([
     [0, 0, 1]
 ])
 # camera_distorition = np.loadtxt('distortion.txt', delimiter=',')
-camera = cv2.VideoCapture("http://192.168.56.103:8080/video")
+# camera = cv2.VideoCapture("http://192.168.56.103:8080/video")
 robot_url = "0.0.0.0:5000"
 sr = StreamReader(url="http://192.168.56.103:8080/video", height=height, width=width)
 sr.start()
+
+cap = cv2.VideoCapture("http://192.168.56.103:8080/video")
 robot_pos = None
 robot_yaw = None
 camera_transformation = None
 person_position = None
 rc = RaspberryController('http://raspberrypi.local:5000')
 robot_set_pos = map[0]
-max_distance = 0.5
+max_distance = 0.0
 state = 'idle'
 help_start = None
 handrise_timeout = datetime.timedelta(seconds=10)
@@ -133,11 +135,12 @@ def turn_off_camera():
     obraz.release()
     return Response('OK')
 
-rc.enable = False
+rc.enable = True
 if __name__ == '__main__':
-    threading.Thread(target=lambda: app.run(host='localhost', port=5000, debug=False, use_reloader=False)).start()
+    # camera = cv2.capture()
+    # threading.Thread(target=lambda: app.run(host='localhost', port=5000, debug=False, use_reloader=False)).start()
     while 1:
-        # _, frame = camera.read()
+        # _, frame = cap.read()
         frame = sr.image
         if frame.max() == 0:
             continue
@@ -150,7 +153,7 @@ if __name__ == '__main__':
         if new_camera_transformation is not None:
             camera_transformation = new_camera_transformation
         if camera_transformation is not None:
-            robot_pos, robot_yaw = get_robot(frame, camera_transformation, camera_matrix, f, None, 4, 0.085, h=0.15)
+            robot_pos, robot_yaw = get_robot(frame, camera_transformation, camera_matrix, f, None, 4, 0.085, h=0.0)
         if camera_transformation is not None:
             for p in workspace:
                 render(frame, p, camera_transformation, f)
@@ -165,10 +168,14 @@ if __name__ == '__main__':
                 render(frame, person_position, camera_transformation, f, color=(0, 255, 0))
 
         # STATE AUTOMATA
+        state = 'following'
+        person_position = map[0]
         print(f"CURRENT STATE: {state}")
+        # state = 'following'
+        # person_position = map[0]
         if state == 'idle':
             if camera_transformation is not None and robot_pos is not None and p is not None:
-                if p.is_laying():
+                if p.is_hand_raised():
                     person_position = p.get_world_position(camera_transformation[:3, :3],
                                                          camera_transformation[:3, 3], f)
                     if person_position is not None:
@@ -177,7 +184,7 @@ if __name__ == '__main__':
 
                 if help_start is not None and datetime.datetime.now() - help_start < help_timeout:
                     continue
-                if p.is_left_hand_raised():
+                if p.is_left_hand_raised() and False:
                     person_position = p.get_world_position(camera_transformation[:3, :3],
                                                            camera_transformation[:3, 3], f)
                     if person_position is not None:
@@ -185,7 +192,7 @@ if __name__ == '__main__':
                         state = 'delivering_kawusia'
                         rc.drive(1)
 
-                if p.is_right_hand_raised():
+                if p.is_right_hand_raised() and False:
                     person_position = p.get_world_position(camera_transformation[:3, :3],
                                                            camera_transformation[:3, 3], f)
                     if person_position is not None:
@@ -194,9 +201,9 @@ if __name__ == '__main__':
                         rc.drive(1)
 
         elif state == 'following':
-            render(frame, person_position, camera_transformation, f, color=(0, 0, 0), thickness=5, radius=15)
-            # if person_position is not None:
-            #     robot_set_pos = person_position
+            if person_position is not None and camera_transformation is not None:
+                render(frame, person_position, camera_transformation, f, color=(0, 0, 0), thickness=5, radius=15)
+                robot_set_pos = person_position
             if camera_transformation is not None and robot_pos is not None:
                 robot2pos = robot_set_pos - robot_pos
                 if np.linalg.norm(robot2pos) < max_distance:
@@ -210,8 +217,8 @@ if __name__ == '__main__':
                     if yaw_change > np.pi:
                         yaw_change -= 2 * np.pi
                     print(yaw_change)
-                    if abs(yaw_change) > np.pi / 6:
-                        rc.turn(-yaw_change / 8)
+                    if abs(yaw_change) > np.pi / 5:
+                        rc.turn(-yaw_change / 12)
                         pass
                     else:
                         pass
@@ -244,8 +251,8 @@ if __name__ == '__main__':
                     if yaw_change > np.pi:
                         yaw_change -= 2 * np.pi
                     print(yaw_change)
-                    if abs(yaw_change) > np.pi / 6:
-                        rc.turn(-yaw_change / 8)
+                    if abs(yaw_change) > np.pi / 8:
+                        rc.turn(-yaw_change / 6)
                         pass
                     else:
                         pass

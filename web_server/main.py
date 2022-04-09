@@ -6,8 +6,7 @@ import requests
 class Camera:
     def __init__(self):
         self.is_stream_on = True
-        self.camera = cv2.VideoCapture(0)
-
+        self.camera = cv2.VideoCapture('http://192.168.56.103:8080/video')
     def check_stream(self):
         return self.is_stream_on
 
@@ -26,7 +25,7 @@ class Camera:
 
 global obraz
 obraz=Camera()
-app = Flask(__name__, static_url_path="/static", static_folder='/home/drozdzal/Python/flask_trash/static')
+app = Flask(__name__, static_url_path="/static", static_folder='/home/pawel/BEST2022/web_server/static')
 
 
 @app.route('/home',methods = ['POST', 'GET'])
@@ -36,9 +35,9 @@ def home():
         position_x = request.form['position_x']
         position_y= request.form['position_y']
         if item == 'water':
-            requests.get("http://172.20.10.11/get?input_servo1_value=1")
+            requests.get("http://192.168.56.76/get?input_servo1_value=1")
         elif item =='coffee':
-                requests.get("http://172.20.10.11/get?input_servo2_value=1")
+                requests.get("http://192.168.56.76/get?input_servo2_value=1")
 
         sleep(5)
         ###tutaj nawigacja do x i y

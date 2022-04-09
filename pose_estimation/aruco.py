@@ -77,7 +77,43 @@ def get_camera(image, map, marker_size, camera_matrix, distortion):
         # print(f'diff:{reported_positions[0][0][:3, 3] - reported_positions[1][0][:3, 3]}')
     return reported_positions[0][0] if reported_positions else None
 
+def get_robot2(image, camera_transformation, camera_matrix, f, distortion, robot_id, robot_marker_size, h=0):
+    corners, detected_ids = detect_aruco_markers(image, camera_matrix, distortion)
+    if not corners:
+        return None, None
+    detections = {id[0]: corner for id, corner in zip(detected_ids, corners)}
+    if robot_id not in detections:
+        return None, None
+    # robot_transformation = get_relative_aruco_transformation(detections[robot_id], robot_marker_size,
+    # camera_matrix, distortion, image)
+    # robot_transformation = np.dot(camera_transformation, robot_transformation)
+    height, width, _ = image.shape
+    origin = detections[robot_id][0][3]
+    origin_world = get_plane_coordinates(camera_transformation[:3, :3],
+                                         camera_transformation[:3, 3], f, origin[0] - width / 2, origin[1] - height / 2,
+                                         h)
+    forward = detections[robot_id][0][0]
+    forward_world = get_plane_coordinates(camera_transformation[:3, :3],
+                                          camera_transformation[:3, 3], f, forward[0] - width / 2,
+                                          forward[1] - height / 2,
+                                          h)
+    render(image, forward_world, camera_transformation, f, color=(0,0,0))
+    render(image, origin_world, camera_transformation, f, color=(0,0,0))
+    robot_forward = forward_world - origin_world
+    yaw = np.math.atan2(robot_forward[1], robot_forward[0])
+    robot_px_coordinates = detections[robot_id][0].mean(axis=0)
 
+    height, width, _ = image.shape
+    robot_px_coordinates[0] = robot_px_coordinates[0] - width / 2
+    robot_px_coordinates[1] = robot_px_coordinates[1] - height / 2
+
+    position = get_plane_coordinates(camera_transformation[:3, :3],
+                                     camera_transformation[:3, 3],
+                                     f,
+                                     robot_px_coordinates[0],
+                                     robot_px_coordinates[1],
+                                     z=h)
+    return position, yaw
 def get_robot(image, camera_transformation, camera_matrix, f, distortion, robot_id, robot_marker_size, h=0):
     corners, detected_ids = detect_aruco_markers(image, camera_matrix, distortion)
     if not corners:

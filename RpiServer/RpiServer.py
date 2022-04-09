@@ -30,6 +30,7 @@ def drive_power():
     else:
         return str(mobile.drive_power)
 
+
 @app.route('/turn', methods=['GET', 'POST'])
 def steering_angle():
     if request.method == 'POST':

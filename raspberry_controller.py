@@ -1,3 +1,5 @@
+import datetime
+
 import requests
 import threading
 
@@ -9,12 +11,17 @@ class RaspberryController:
 
     def drive(self, amount):
         if self.enable:
-            resp = requests.post(self.url+'/drive', params={'power': amount})
-            return resp.content
+            start = datetime.datetime.now()
+            #resp = requests.post(self.url+'/drive', params={'power': amount})
+            print(f'req_time: {datetime.datetime.now()-start}')
+
+            return None #resp.content
 
     def turn(self, amount):
         if self.enable:
+            start = datetime.datetime.now()
             resp = requests.post(self.url+'/turn', params={'angle': amount})
+            print(f'req_time: {datetime.datetime.now()-start}')
             return resp.content
 
 
