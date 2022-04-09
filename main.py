@@ -29,6 +29,7 @@ if __name__ == '__main__':
     ])
     # camera_distorition = np.loadtxt('distortion.txt', delimiter=',')
     camera = cv2.VideoCapture("http://192.168.56.103:8080/video")
+    robot_url = "0.0.0.0:5000"
     sr = StreamReader(url="http://192.168.56.103:8080/video", height=height, width=width)
     sr.start()
     robot_pos = None
