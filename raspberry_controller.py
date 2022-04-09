@@ -14,8 +14,9 @@ class RaspberryController:
         resp = requests.post(self.url+'/turn', params={'angle': amount})
         return resp.content
 
+
 if __name__ == '__main__':
     rc = RaspberryController('http://raspberrypi.local:5000')
-    resp = rc.drive(1)
+    #resp = rc.drive(1)
     # pass
-    # resp = rc.turn(-1)
+    resp = rc.turn(-0.2)

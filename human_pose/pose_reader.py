@@ -58,6 +58,12 @@ class Pose:
     def is_hand_raised(self):
         return self.world_landmarks[20].y < self.world_landmarks[0].y or self.world_landmarks[19].y < self.world_landmarks[0].y
 
+    def is_left_hand_raised(self):
+        return self.world_landmarks[20].y < self.world_landmarks[0].y
+
+    def is_right_hand_raised(self):
+        return self.world_landmarks[19].y < self.world_landmarks[0].y
+
 class PoseReader:
     def __init__(self):
         self.mpPose = mp.solutions.pose

@@ -43,10 +43,10 @@ def get_plane_coordinates(camera_rotation, camera_position, f, x, y, z=0):
     return world_pos
 
 
-def render(image, position, camera, f, color=(0,0,255)):
+def render(image, position, camera, f, color=(0,0,255), thickness=3, radius=10):
     height, width, _  = image.shape
     pos = np.ones(4)
     pos[:3] = position
     projected = np.linalg.inv(camera).dot(pos)
     projected = projected/projected[2] * f
-    cv2.circle(image, (int(projected[0] + width/2), int(projected[1]+height/2)), 10, color, 3)
+    cv2.circle(image, (int(projected[0] + width/2), int(projected[1]+height/2)), radius, color, thickness)
