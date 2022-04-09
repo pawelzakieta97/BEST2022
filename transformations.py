@@ -37,9 +37,9 @@ def translate(translation):
                      (0, 0, 0, 1)))
 
 
-def get_plane_coordinates(camera_rotation, camera_position, f, x, y):
+def get_plane_coordinates(camera_rotation, camera_position, f, x, y, z=0):
     direction = camera_rotation.dot(np.array([x, y, f]) / f)
-    world_pos = camera_position - direction * (camera_position[2] / direction[2])
+    world_pos = camera_position - direction * ((camera_position[2]-z) / direction[2])
     return world_pos
 
 
