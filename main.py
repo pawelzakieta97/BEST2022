@@ -51,11 +51,16 @@ if __name__ == '__main__':
             for p in workspace:
                 render(frame, p, camera_transformation, f)
             if robot_pos is not None:
-                render(frame, robot_pos, camera_transformation, f, color=(255,0,0))
-        p = None
-        # p = pr.detect(image_bgr=frame, show=True)
+                render(frame, robot_pos, camera_transformation, f, color=(255, 0, 0))
+        # p = None
+        p = pr.detect(image_bgr=frame, show=True)
         if p and camera_transformation is not None:
-            print(p.get_world_position(camera_transformation[:3, :3],
-                                       camera_transformation[:3, 3], f))
+            person_position = p.get_world_position(camera_transformation[:3, :3],
+                                                   camera_transformation[:3, 3], f)
+            print(person_position)
+            if person_position is not None:
+                render(frame, person_position, camera_transformation, f, color=(0, 255, 0))
+        if p is not None:
+            print(p.is_hand_raised())
         cv2.imshow("okno", frame)
         cv2.waitKey(1)
