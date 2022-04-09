@@ -1,3 +1,4 @@
+import cv2
 import numpy as np
 from math import sin, cos, pi, sqrt
 import itertools
@@ -34,3 +35,18 @@ def translate(translation):
                      (0, 1, 0, y),
                      (0, 0, 1, z),
                      (0, 0, 0, 1)))
+
+
+def get_plane_coordinates(camera_rotation, camera_position, f, x, y):
+    direction = camera_rotation.dot(np.array([x, y, f]) / f)
+    world_pos = camera_position - direction * (camera_position[2] / direction[2])
+    return world_pos
+
+
+def render(image, position, camera, f, color=(0,0,255)):
+    height, width, _  = image.shape
+    pos = np.ones(4)
+    pos[:3] = position
+    projected = np.linalg.inv(camera).dot(pos)
+    projected = projected/projected[2] * f
+    cv2.circle(image, (int(projected[0] + width/2), int(projected[1]+height/2)), 10, color, 3)

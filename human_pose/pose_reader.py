@@ -3,7 +3,7 @@ import numpy as np
 import mediapipe as mp
 import time
 from stream_reader import StreamReader
-from transformations import translate, rotz, rotx, roty
+from transformations import translate, rotz, rotx, roty, get_plane_coordinates
 
 mpPose = mp.solutions.pose
 pose = mpPose.Pose()
@@ -28,12 +28,13 @@ class Pose:
             pass
 
     def get_world_position(self, camera_rotation, camera_position, f=1):
-        # print(self.landmarks[0])
-        foot_pos = np.array([self.landmarks_px[0][0], self.landmarks_px[0][1], f])
-        # print(foot_pos)
-        direction = camera_rotation.dot(foot_pos / f)
-        world_pos = camera_position - direction * (camera_position[2]/direction[2])
-        return world_pos
+        valid_landmarks = [l.visibility>0.99 for l in self.landmarks]
+        if not valid_landmarks:
+            return None
+        lowest_landmark = np.where(np.array(valid_landmarks))[0][-1]
+        return get_plane_coordinates(camera_rotation, camera_position, f,
+                                     self.landmarks_px[lowest_landmark][0],
+                                     self.landmarks_px[lowest_landmark][0])
 
 
 class PoseReader:
