@@ -1,7 +1,7 @@
 import cv2
 from flask import Flask, Response, render_template,request
 from time import sleep
-
+import requests
 
 class Camera:
     def __init__(self):
@@ -32,12 +32,19 @@ app = Flask(__name__, static_url_path="/static", static_folder='/home/drozdzal/P
 @app.route('/home',methods = ['POST', 'GET'])
 def home():
     if request.method=="POST":
+        item = request.form['item']
         position_x = request.form['position_x']
         position_y= request.form['position_y']
-        yaw = request.form['yaw']
-        print(position_x)
-        print(position_y)
-        print(yaw)
+        if item == 'water':
+            requests.get("http://172.20.10.11/get?input_servo1_value=1")
+        elif item =='coffee':
+                requests.get("http://172.20.10.11/get?input_servo2_value=1")
+
+        sleep(5)
+        ###tutaj nawigacja do x i y
+        print(f"Chce do x={position_x} oraz y={position_y}")
+        ###
+
     return render_template("Home.html",mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/video_buffor')
